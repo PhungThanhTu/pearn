@@ -9,7 +9,7 @@ services:
     volumes:
       - ../database/mongo:/data/db
     ports:
-      - "27018:27017"
+      - "27017:27017"
   client:
     container_name: "pearn-client"
     volumes:
@@ -28,6 +28,8 @@ services:
     env_file: .env
     ports:
       - 5050:5050
+    depends_on: 
+      - mongo
     volumes:
       - ../backend:/backend
       - /backend/node_modules

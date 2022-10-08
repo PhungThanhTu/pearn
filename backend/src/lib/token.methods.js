@@ -5,39 +5,39 @@ const sign = promisify(jwt.sign).bind(jwt);
 const verify = promisify(jwt.verify).bind(jwt);
 
 
-exports.generateToken =  async (payload,secretSignature,tokenLife) => {
+exports.generateToken = async (payload, secretSignature, tokenLife) => {
     try {
-            return await sign( {
-                payload
-            },
+        return await sign({
+            payload
+        },
             secretSignature,
             {
                 algorithm: 'HS256',
-				expiresIn: tokenLife,
+                expiresIn: tokenLife,
             });
     }
-    catch(err) {
+    catch (err) {
         console.log(`erro generating token from ${payload} with errorr ${err}`);
         return null;
     }
 };
 
-exports.decodeToken = async (token,secretKey) => {
+exports.decodeToken = async (token, secretKey) => {
     try {
-        return await verify(token,secretKey,{
-            ignoreExpiration:true,
+        return await verify(token, secretKey, {
+            ignoreExpiration: true,
         });
-    } catch(err){
+    } catch (err) {
         console.log(`Error decoding token ${err}`);
         return null;
     }
 };
 
-exports.verifyToken = async (token,secretKey) => {
+exports.verifyToken = async (token, secretKey) => {
     try {
-        return await verify(token,secretKey);
+        return await verify(token, secretKey);
     }
-    catch (err){
+    catch (err) {
         console.log(`Error verify ${err}`);
         return null;
     }

@@ -1,24 +1,24 @@
 const userModel = require('../models/users.model')
 const bcrypt = require('bcrypt');
-const {generateToken} = require('../lib/token.methods');
+const { generateToken } = require('../lib/token.methods');
 const randToken = require('rand-token');
 
 
-const hashPassword = async  (rawPassword) => {
+const hashPassword = async (rawPassword) => {
     var salt = await bcrypt.genSalt(10);
     console.info("Password sensitive :");
     console.log(typeof rawPassword);
-    const result = await bcrypt.hash(rawPassword,salt);
+    const result = await bcrypt.hash(rawPassword, salt);
     return result;
 }
 
 const checkUserExists = async (username) => {
     const user = await userModel.getUser(username);
-    if(!user) return false;
+    if (!user) return false;
     return true;
 }
 
-const createNewUser = async (username,rawpassword,fullname,email,role) => {
+const createNewUser = async (username, rawpassword, fullname, email, role) => {
     const hashedPassword = await hashPassword(rawpassword);
     const newUser = {
         username,
@@ -28,16 +28,16 @@ const createNewUser = async (username,rawpassword,fullname,email,role) => {
         role
     }
     const result = await userModel.createUser(newUser);
-    if(!result) {
+    if (!result) {
         return {
-            statuscode:400,
-            data:{
+            statuscode: 400,
+            data: {
                 message: "Error during creation"
             }
         }
     }
     return {
-        statuscode:201,
+        statuscode: 201,
         data: {
             username,
             fullname,
@@ -48,25 +48,25 @@ const createNewUser = async (username,rawpassword,fullname,email,role) => {
 
 }
 
-const comparePassword = async (inputRawPassword,hashedValidPassword) => {
-    return bcrypt.compareSync(inputRawPassword,hashedValidPassword);
+const comparePassword = async (inputRawPassword, hashedValidPassword) => {
+    return bcrypt.compareSync(inputRawPassword, hashedValidPassword);
 }
 
-const checkUsernameAndPasswordValid = async (username,password) => {
+const checkUsernameAndPasswordValid = async (username, password) => {
     const failedResult = {
-        statuscode:401,
+        statuscode: 401,
         data: {
-            message:"Invalid credentials"
+            message: "Invalid credentials"
         }
     }
 
     const user = await userModel.getUser(username);
-    if(!user) return  failedResult;
+    if (!user) return failedResult;
 
     const validHashedPassword = user.password;
-    const isPasswordValid = await comparePassword(password,validHashedPassword);
+    const isPasswordValid = await comparePassword(password, validHashedPassword);
 
-    if(isPasswordValid) return user;
+    if (isPasswordValid) return user;
 
     return failedResult;
 
@@ -75,9 +75,9 @@ const checkUsernameAndPasswordValid = async (username,password) => {
 const createUserToken = async (user) => {
 
     const failedMessage = {
-        statuscode:401,
-        data:{
-            message:"Authentication failed"
+        statuscode: 401,
+        data: {
+            message: "Authentication failed"
         }
     }
 
@@ -86,13 +86,13 @@ const createUserToken = async (user) => {
 
     // data for access token
     const DataForAccessToken = {
-        username:user.username,
-        role:user.role
+        username: user.username,
+        role: user.role
     };
 
-    const token = generateToken(DataForAccessToken,AccessTokenSecret,AccessTokenLife);
+    const token = generateToken(DataForAccessToken, AccessTokenSecret, AccessTokenLife);
 
-    if(!token) return failedMessage;
+    if (!token) return failedMessage;
 
     return token;
 }
@@ -101,21 +101,21 @@ const generateRefreshToken = async (username) => {
     // generate refresh token
     let refreshToken = randToken.generate(100);
     // generate new token if user have no token before
-    const result = await userModel.updateUser(username,{
+    const result = await userModel.updateUser(username, {
         refreshtoken: refreshToken
     })
-    if(result) return refreshToken;
-    return undefined;    
+    if (result) return refreshToken;
+    return undefined;
 }
 
 module.exports = {
-    register: async (req,res) => {
+    register: async (req, res) => {
         const BodyLogMessage = req.body;
         console.log(BodyLogMessage);
         const isExist = await checkUserExists(req.body.username);
-        if(isExist){
+        if (isExist) {
             res.status(409).send({
-                message:"Username unavailable"
+                message: "Username unavailable"
             });
             return;
         }
@@ -126,25 +126,25 @@ module.exports = {
             req.body.email,
             "admin"
         );
-        res.status(result.statuscode).send(result.data); 
+        res.status(result.statuscode).send(result.data);
     },
-    login: async (req,res) => {
-        const credentials = await checkUsernameAndPasswordValid(req.body.username,req.body.password);
-        if(credentials.statuscode)
+    login: async (req, res) => {
+        const credentials = await checkUsernameAndPasswordValid(req.body.username, req.body.password);
+        if (credentials.statuscode)
             return res.status(credentials.statuscode).send(credentials.data);
         const token = await createUserToken(credentials);
 
-        if(token.statuscode) return res.status(token.statuscode).send(token.data);
+        if (token.statuscode) return res.status(token.statuscode).send(token.data);
 
         const refreshToken = await generateRefreshToken(credentials.username);
 
-        if(!refreshToken) return res.status(400).send({
+        if (!refreshToken) return res.status(400).send({
             message: "Login failed"
         })
 
         return res.status(200).send({
-            token:token,
-            refreshToken:refreshToken,
+            token: token,
+            refreshToken: refreshToken,
         })
 
     }

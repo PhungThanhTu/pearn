@@ -102,7 +102,7 @@ const generateRefreshToken = async (username) => {
     let refreshToken = randToken.generate(100);
     // generate new token if user have no token before
     const result = await userModel.updateUser(username,{
-        refreshToken: refreshToken
+        refreshtoken: refreshToken
     })
     if(result) return refreshToken;
     return undefined;    

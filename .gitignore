@@ -2,3 +2,4 @@
 /docker/.env
 /backend/.env
 /frontend/.env
+/database/mongo/

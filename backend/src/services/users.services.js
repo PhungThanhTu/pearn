@@ -1,6 +1,6 @@
 const userModel = require('../models/users.model')
 const bcrypt = require('bcrypt');
-const { generateToken } = require('../lib/token.methods');
+const { generateToken, decodeToken } = require('../lib/token.methods');
 const randToken = require('rand-token');
 
 
@@ -146,6 +146,42 @@ module.exports = {
             token: token,
             refreshToken: refreshToken,
         })
+
+    },
+    refresh: async (req, res) => {
+        const expiredAccessToken = req.body.token;
+        const refreshToken = req.body.refreshToken;
+        const secretSignature = process.env.ACCESS_TOKEN_SECRET;
+        const tokenLife = process.env.ACCESS_TOKEN_LIFE;
+
+        if (!refreshToken || !expiredAccessToken)
+            return res.status(401).send({
+                message: "Unauthorized"
+            });
+
+        const decodedPayload = await decodeToken(expiredAccessToken, secretSignature);
+        const username = decodedPayload.payload.username;
+        const user = await userModel.getUser(username);
+        const role = user.role;
+
+        if (user.refreshtoken !== refreshToken)
+            return res.status(401).send({
+                message: "Unauthorized"
+            });
+
+        const dataForAccessToken = {
+            username,
+            role
+        };
+
+        const newAccessToken = await generateToken(dataForAccessToken, secretSignature, tokenLife);
+        const newRefreshToken = await generateRefreshToken(username);
+
+        return res.status(201).send({
+            token: newAccessToken,
+            refreshToken: newRefreshToken
+        })
+
 
     }
 }

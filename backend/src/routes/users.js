@@ -4,7 +4,7 @@ const { authorize } = require('../middlewares/auth.middleware')
 
 /* GET users listing. */
 router.get('/', authorize, function (req, res, next) {
-  res.send('respond with a resource');
+  res.send(req.user);
 });
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const userModel = require('../models/users.model')
+const metaModel = require('../models/metadata.model')
 const bcrypt = require('bcrypt');
 const { generateToken, decodeToken } = require('../lib/token.methods');
 const randToken = require('rand-token');
@@ -124,8 +125,9 @@ module.exports = {
             req.body.password,
             req.body.fullname,
             req.body.email,
-            "admin"
+            req.body.rol
         );
+        
         res.status(result.statuscode).send(result.data);
     },
     login: async (req, res) => {
@@ -183,5 +185,33 @@ module.exports = {
         })
 
 
+    },
+    oneTimeAdminRegister: async (req,res) => {
+        const locked = await metaModel.getFreeRegister();
+        console.log(locked);
+
+        
+        if(locked){
+            const result = await createNewUser(
+                req.body.username,
+                req.body.password,
+                req.body.fullname,
+                req.body.email,
+                "admin"
+            );
+            lockResult = await metaModel.lockFreeRegister();
+            return res.status(result.statuscode).send({
+                lockRegisterResult:lockResult,
+                registerResult:result.data
+            });
+            
+
+
+        }
+        
+        return res.status(401).send("Unauthorized");
+
+        
     }
+
 }

@@ -10,16 +10,6 @@ services:
       - ../database/mongo:/data/db
     ports:
       - "27017:27017"
-  client:
-    container_name: "pearn-client"
-    volumes:
-      - ../frontend:/frontend
-      - /frontend/node_modules
-    build:
-      context: "./../frontend"
-      dockerfile: "./Dockerfile"
-    ports: 
-      - 3000:3000
   server:
     container_name: "pearn-server"
     build:

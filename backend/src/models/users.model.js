@@ -23,7 +23,8 @@ var UserSchema = mongoose.Schema(
             enum: [
                 "admin",
                 "student",
-                "lecturer"
+                "lecturer",
+                "staff"
             ],
             required: true
         },

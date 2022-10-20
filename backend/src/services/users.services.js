@@ -114,6 +114,13 @@ module.exports = {
         const BodyLogMessage = req.body;
         console.log(BodyLogMessage);
         const isExist = await checkUserExists(req.body.username);
+
+        if(req.user.role !== "admin") {
+            return res.status(400).send({
+                message:"Not allowed"
+            });
+        };
+
         if (isExist) {
             res.status(409).send({
                 message: "Username unavailable"
@@ -125,7 +132,7 @@ module.exports = {
             req.body.password,
             req.body.fullname,
             req.body.email,
-            req.body.rol
+            req.body.role
         );
         
         res.status(result.statuscode).send(result.data);

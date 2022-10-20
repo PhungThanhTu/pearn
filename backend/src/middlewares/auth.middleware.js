@@ -8,6 +8,9 @@ function getAccessTokenFromHeader(req) {
 
 module.exports = {
     authorize: async (req, res, next) => {
+
+        this.filterAttack(req,res,next);
+
         const accessToken = getAccessTokenFromHeader(req);
         const secret = process.env.ACCESS_TOKEN_SECRET;
         if (!accessToken) {
@@ -25,6 +28,11 @@ module.exports = {
 
         req.user = user;
 
+        return next();
+    },
+    filterAttack: async (req,res,next) => {
+        if(req.user)
+            return res.status(400).send("attack detected");
         return next();
     }
 }

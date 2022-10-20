@@ -11,7 +11,6 @@ module.exports = {
   saveImage: async (image) => {
     const newImage = new Image(image);
     const result = await newImage.save();
-    console.log(result);
     return result;
   },
   getImage: async (oid) => {

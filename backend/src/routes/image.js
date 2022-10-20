@@ -15,7 +15,9 @@ router.post('/',imageMiddleware.single("image"),async (req,res) => {
 
    const result = await model.saveImage(final_data);
    // data will be stored in Mongo so we won't need the original image more
-   fs.unlink(req.file.path);
+   fs.unlinkSync(req.file.path,(err) => {
+        console.log("Error Deleting file");
+   });
    
    res.send(result._id);
 })

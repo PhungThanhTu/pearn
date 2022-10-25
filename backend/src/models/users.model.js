@@ -37,6 +37,9 @@ var User = mongoose.model('users', UserSchema, 'users');
 
 // handle CRUD for user
 module.exports = {
+    getUsers: async ({filter,pageSize,pageNumber}) => {
+        
+    },
     createUser: async (user) => {
         let newUser = new User(user);
         try {

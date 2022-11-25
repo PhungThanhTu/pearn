@@ -9,7 +9,11 @@ var usersRouter = require('./src/routes/users');
 var authRouter = require('./src/routes/auth');
 var imageRouter = require('./src/routes/image');
 var mongoose = require('mongoose');
+const swaggerUi = require('swagger-ui-express');
+const { swaggerJson } = require('./src/utils/swagger.utils');
 require('dotenv').config();
+
+
 // connect to mongo
 console.log(process.env.MONGO_CON_STRING);
 mongoose
@@ -32,6 +36,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+app.use('/swagger', swaggerUi.serve,swaggerUi.setup(swaggerJson));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);

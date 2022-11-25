@@ -25,6 +25,22 @@ module.exports = {
         const updatingData = {
             "value":false
         }
+
+        let doc = await Meta.findOne(filter);
+        if(!doc){
+            console.log("default metadata has not been initialized");
+            let defaultData = {
+                config: "FreeRegisterUnlocked",
+                value: true
+            }
+
+            const newData = new Meta(defaultData);
+
+            const result = await newData.save();
+
+            console.log("Default data created successfully");
+        }
+
         try {
             let doc = await Meta.findOneAndUpdate(filter, updatingData);
             console.log(`free register locked ${doc}`);

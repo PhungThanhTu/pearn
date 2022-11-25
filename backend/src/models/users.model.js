@@ -29,7 +29,7 @@ var UserSchema = mongoose.Schema(
             required: true
         },
         refreshtoken: String,
-        avatar_url: String
+        avatar: String
     }
 )
 

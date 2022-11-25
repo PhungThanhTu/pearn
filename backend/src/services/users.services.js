@@ -3,6 +3,7 @@ const metaModel = require('../models/metadata.model')
 const bcrypt = require('bcrypt');
 const { generateToken, decodeToken } = require('../lib/token.methods');
 const randToken = require('rand-token');
+const { getUser, updateUser } = require('../models/users.model');
 
 
 const hashPassword = async (rawPassword) => {
@@ -109,6 +110,92 @@ const generateRefreshToken = async (username) => {
     return undefined;
 }
 
+const updateUserProfile = async (username, updatingUser) => {
+    const user = await getUser(username);
+
+    const password = user.password;
+
+    // we dont allow user to update role
+    updatingUser.role = user.role;
+
+    // we don't allow user to update username
+    updatingUser.username = username;
+
+    // we don't allow to update password when updating profile because of 
+    // encryption issue
+    updatingUser.password = password;
+
+    
+    
+
+    const updateResult = await updateUser(username,updatingUser);
+
+    return updateResult;
+
+}
+
+const changePassword = async (username,oldPassword,newPassword) => {
+
+    const failedResult = {
+        statuscode:403,
+        data:{
+            message:"Change password failed"
+        }
+    }
+
+    const successResult = {
+        statuscode:200,
+        data:{
+            message:"Change password successfully"
+        }
+    }
+
+    const user = await getUser(username);
+
+    const password = user.password;
+
+    const isPasswordValid = await comparePassword(oldPassword,password);
+
+    if(!isPasswordValid)
+        return failedResult;
+    
+    const newHashedPassword = await hashPassword(newPassword);
+
+    user.password = newHashedPassword;
+
+    const result =  await updateUser(username,user);
+
+    if(result) return successResult;
+
+    return failedResult;
+
+}
+
+const getSingleUserProfile = async (username) => {
+    const failedResult = {
+        statuscode:400,
+        data:{
+            message:"Cannot fetch user profile"
+        }
+    }
+
+    const user = await getUser(username);
+
+    if(!user) return failedResult;
+
+    const successResult = {
+        statuscode:200,
+        data:{
+            username:user.username,
+            fullname:user.fullname,
+            email:user.email,
+            role: user.role,
+            avatar:user.avatar
+        }
+    }
+    return successResult;
+}
+
 module.exports = {
     register: async (req, res) => {
         const BodyLogMessage = req.body;
@@ -154,6 +241,7 @@ module.exports = {
         return res.status(200).send({
             token: token,
             refreshToken: refreshToken,
+            role: credentials.role
         })
 
     },
@@ -219,6 +307,32 @@ module.exports = {
         return res.status(401).send("Unauthorized");
 
         
+    },
+    editProfile: async (req,res) => {
+        const username = req.user.username;
+        const updatingData = req.body;
+
+        const result = await updateUserProfile(username,updatingData);
+
+        if(!result) return res.status(408).json("Failed");
+
+        return res.status(200).json({
+            message: "Updated Successfully"
+        });
+    },
+    changeUserPassword: async (req,res) => {
+        const username = req.user.username;
+
+        const result = await changePassword(username,req.body.oldPassword,req.body.newPassword);
+
+        return res.status(result.statuscode).json(result.data);
+    },
+    getProfile: async (req,res) => {
+        const username = req.user.username;
+
+        const result = await getSingleUserProfile(username);
+
+        return res.status(result.statuscode).json(result.data);
     }
 
 }

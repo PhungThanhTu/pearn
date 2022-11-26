@@ -3,7 +3,7 @@ const metaModel = require('../models/metadata.model')
 const bcrypt = require('bcrypt');
 const { generateToken, decodeToken } = require('../lib/token.methods');
 const randToken = require('rand-token');
-const { getUser, updateUser } = require('../models/users.model');
+const { getUser, updateUser, deleteUser } = require('../models/users.model');
 
 
 const hashPassword = async (rawPassword) => {
@@ -333,6 +333,36 @@ module.exports = {
         const result = await getSingleUserProfile(username);
 
         return res.status(result.statuscode).json(result.data);
+    },
+    delete: async (req,res) => {
+        if(req.user.role !== "admin") {
+            return res.status(400).send({
+                message:"Not allowed"
+            });
+        };
+
+        const username = req.body.username;
+
+        const userExists = await checkUserExists(username);
+
+        if(!userExists){
+            return res.status(404).send({
+                message:"Not found"
+            });
+        }
+
+        const result = await deleteUser(username);
+
+        if(result) {
+            return res.status(200).json({
+                message:`User ${username} has been deleted successfully`
+            })
+        }
+
+        
+        return res.status(408).json({
+                message:`User delete failed`
+            })
     }
 
 }

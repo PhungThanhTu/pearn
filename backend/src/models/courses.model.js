@@ -50,9 +50,6 @@ module.exports = {
             fullname:1
         });
 
-        console.info('FINDING COURSE');
-        console.log(course);
-
         return course;
     },
     getCourses: async (query) => {
@@ -72,7 +69,8 @@ module.exports = {
         return result;
     },
     deleteCourse: async (courseId) => {
-        return await Course.findByIdAndDelete(courseId);
+        const deleteResult = await Course.deleteOne({_id:courseId});
+        return deleteResult;
     },
     // additional function for optimization
     addStudentToCourse: async (course,student) => {
@@ -81,18 +79,29 @@ module.exports = {
 
         const result = await course.save()
 
-        console.info("ADDING STUDENT");
-        console.log(result);
+
 
         return result;
     },
-    removeStudent: async (course, user) => {
-
-        const result = await Course.updateOne(course,{
-            $pull: {
-                students: user._id
-            }
+    checkStudentInCourse: async (course,user) => {
+        const query = await Course.find({
+            _id: course._id,
+            students: user
         });
+
+        console.info("Check student in course");
+
+        console.log(query);
+
+        const result = query.length;
+
+        return result;
+    }
+    ,
+    removeStudent: async (course, student) => {
+
+        course.students.pull(student);
+        const result = await course.save();
 
         console.info("REMOVING STUDENT");
         console.log(result);
@@ -100,19 +109,16 @@ module.exports = {
         return result;
     },
     changeLecturer: async (course, lecturer) => {
-        const result = await Course.updateOne(course,{
-            lecturer: lecturer
-        });
+        course.lecturer = lecturer;
 
-        console.info('CHANGE LECTURER');
+        const result = await course.save();
         console.log(result);
-
         return result;
     },
     removeLecturer: async (course) => {
-        const result = await Course.updateOne(course,{
-            lecturer: undefined
-        });
+        course.lecturer = undefined;
+
+        const result = course.save();
 
         return result;
     }

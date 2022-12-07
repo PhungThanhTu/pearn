@@ -76,7 +76,7 @@ module.exports = {
     deleteUser: async (username) => {
         const filter = { "username": username };
         try {
-            let doc = await User.findOneAndDelete(filter, updatingData);
+            let doc = await User.findOneAndDelete(filter);
             console.log(`user updated ${doc}`);
             return true;
         }

@@ -1,0 +1,6 @@
+/.vscode/
+/docker/.env
+/backend/.env
+/.DS_Store
+/frontend/.env
+/database/mongo/

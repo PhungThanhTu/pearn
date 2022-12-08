@@ -12,12 +12,12 @@ let Block = mongoose.model('markdownContent',courseSchema,'contents');
 
 module.exports = {
     upsertMarkdownContentInBlock: async (block,markdown) => {
-
+        // TODO: upsert block data
     },
     deleteMarkdownContentInBlock: async (block) => {
-
+        //TODO: delete both content in block and block itself
     },
     getContent: async (block) => {
-
+        //TODO: retrieve content info when call
     }
 }

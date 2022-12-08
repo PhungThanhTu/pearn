@@ -36,15 +36,15 @@ let Block = mongoose.model('block',courseSchema,'blocks');
 
 module.exports = {
     getBlockById: async (id) => {
-
+        // TODO: retrieve block object by id
     },
     createBlock: async (course,blockName,type)  => {
-
+        // TODO: create new block
     },
     deleteBlock: async (block) => {
-
+        // TODO: delete block
     },
     getAllBlockInCourse: async (course) => {
-
+        // TODO: get all block in course
     },
 }

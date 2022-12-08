@@ -4,7 +4,7 @@ const { authorize } = require('../middlewares/auth.middleware');
 const { createCourse, getCourse, httpDeleteCourse, httpCreateCourse, httpGetCourse, httpAddStudent, httpRemoveStudent, httpAddLecturer, httpRemoveLecturer } = require('../services/courses.service');
 
 
-router.post('/', authorize,httpCreateCourse);
+router.post('/',authorize("staff"),httpCreateCourse);
 router.get('/:id',authorize,httpGetCourse);
 router.delete('/:id',authorize,httpDeleteCourse);
 router.post('/addStudent',authorize,httpAddStudent);

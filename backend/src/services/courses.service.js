@@ -1,32 +1,13 @@
 const { insertCourse, findCourse, deleteCourse, addStudentToCourse, changeLecturer, removeLecturer, checkStudentInCourse, removeStudent} = require("../models/courses.model");
 const { getUser } = require("../models/users.model");
 
-function allowStaffOnly (req,res) {
-    const authorization = req.user;
-
-        if(authorization.role != "staff")
-        {
-            return {
-                status: 400,
-                data:{
-                message:"No permission"
-                }
-            }
-        }
-        return {
-            status: 408,
-            data: {
-                message:"Authentication success but some error has occured"
-            }
-        }
-}
+const handleCreated = (res,data) => res.status(201).json(data);
+const handleBadRequest = (res,err) => res.status(400).json(err);
+const handleOk = (res,data) => res.status(200).json(data);
+const handleNotFound = (res,err) => res.status(404).json(err);
 
 module.exports = {
     httpCreateCourse: async (req,res) => {
-
-        let result = allowStaffOnly(req,res);
-        if(result.status === 400)
-            return res.status(result.status).json(result.data);
 
         const course = req.body;
 
@@ -36,106 +17,46 @@ module.exports = {
                 locked: course.locked,
                 code: course.code
             });
-
-            result = {
-                status: 201,
-                data: {
-                    id:resultId
-                }
-            }
+            return handleCreated(res,resultId);
         }
         catch {
-            result = {
-                status: 400,
-                data: {
-                    message:"Course creation failed, maybe code is not available"
-                }
-            }
+            return handleBadRequest(res,"Creation failed");
         }
-
-        return res.status(result.status).json(result.data);
     },
     httpGetCourse: async (req,res) => {
-
-        let result = allowStaffOnly(req,res);
-
-        if(result.status === 400){
-            return res.status(result.status).json(result.data);
-        }
 
         const courseId = req.params.id;
 
         const course = await findCourse(courseId);
 
-        if(course) {
-            result = {
-                status:200,
-                data:course
-            }
-        }
-        else {
-            result = {
-                status:404,
-                data: {
-                    message:"Not found"
-                }
-            }
-        }
-        return res.status(result.status).json(result.data);
+        if(!course) return handleNotFound(res,{
+            message:"Not found"
+        });
 
+        return handleOk(res,course);
     },
     httpDeleteCourse: async (req,res) => {
-        let result = allowStaffOnly(req,res);
-
+        
         const courseId = req.params.id;
-
-        if(result.status === 400)
-        {
-            return res.status(result.status).json(result.data)
-        }
-
         try {
             const deleteResult = await deleteCourse(courseId);
 
-            console.log(courseId);
-            console.log(deleteResult);
-
-            if(deleteResult) {
-
-                console.log(deleteResult);
-                
-                result = {
-                    status:200,
-                    data: {
+            if(deleteResult.deletedCount === 0) return handleNotFound(res,{
+                message:"Not found"
+            });
+            if(deleteResult) {       
+                 return handleOk(res,{
                         message:`deleted ${deleteResult.deletedCount} course `
-                    }
+                    })
                 }
-
-                if(deleteResult.deletedCount === 0){
-                    result.status = 404;
-                    result.data.message = `Queried course not found`;
-                }
-            }
         }
         catch {
-            result = {
-                status:408,
-                data: {
-                    message:"Delete failed"
-                }
-            }
-        }
-
-        return res.status(result.status).json(result.data);
-
-        
+            return handleBadRequest(res,{
+                message:"Delete failed"
+            })
+        }        
     },
     httpAddStudent: async (req,res) => {
-        let result = allowStaffOnly(req,res);
-
-        if(result.status === 400) {
-            return res.status(result.status).json(result.data);
-        }
 
             const username = req.body.username;
             const courseId = req.body.courseId;
@@ -148,51 +69,42 @@ module.exports = {
 
                 if(!foundStudent || !foundCourse || foundStudent.role !== "student")
                 {
-                    result.status = 404;
-                    result.data = {
+                    const notFoundMessage = {
                         message : "Student or course not found"
                     }
-                    return res.status(result.status).json(result.data);
+                    return handleNotFound(res,notFoundMessage);
                 }
 
                 const isAlreadyAdded = await checkStudentInCourse(foundCourse,foundStudent);
 
                 if(isAlreadyAdded)
                 {
-                    result.status = 408;
-                    result.data = {
+                    const alreadyAddedMessage = {
                         message : "Student has already in course"
                     }
-                    return res.status(result.status).json(result.data);
+                    return handleBadRequest(res,alreadyAddedMessage);
                 }
 
                 const queryResult = await addStudentToCourse(foundCourse,foundStudent);
 
-                result.status = 200;
-                result.data = {
+                const addedSuccessMessage = {
                     message:`Added student ${username} to course ${courseId}`,
                     debugResult: queryResult._id
                 }
 
+                return handleOk(res,addedSuccessMessage);
+
             }
             catch {
-
-                result.status = 408
-                result.data = {
+                const addFailedMessage = {
                     message:"Add failed"
                 }
 
+                return handleBadRequest(res,addFailedMessage);
             }
-
-            return res.status(result.status).json(result.data);
 
     },
     httpRemoveStudent: async (req,res) => {
-        let result = allowStaffOnly(req,res);
-
-        if(result.status === 400) {
-            return res.status(result.status).json(result.data);
-        }
 
             const username = req.body.username;
             const courseId = req.body.courseId;
@@ -214,40 +126,28 @@ module.exports = {
 
                 if(!isAlreadyAdded)
                 {
-                    result.status = 408;
-                    result.data = {
+                    const notAddedMessage = {
                         message : "Student hasn't been added to the course"
                     }
-                    return res.status(result.status).json(result.data);
+                    return handleBadRequest(res,notAddedMessage);
                 }
 
                 const queryResult = await removeStudent(foundCourse,foundStudent);
 
-                result.status = 200;
-                result.data = {
+                const removedSuccessMessage = {
                     message:`Removed student ${username} from course ${courseId}`,
                     debugResult: queryResult._id
                 }
-
+                return handleOk(res,removedSuccessMessage);
             }
             catch {
-
-                result.status = 408
-                result.data = {
+                const failedMessage = {
                     message:"Deletion failed"
                 }
-
+                return handleBadRequest(res,failedMessage);
             }
-
-            return res.status(result.status).json(result.data);
     },
     httpAddLecturer: async (req,res) => {
-        
-        let result = allowStaffOnly(req,res);
-
-        if(result.status === 400) {
-            return res.status(result.status).json(result.data);
-        }
 
             const username = req.body.username;
             const courseId = req.body.courseId;
@@ -256,44 +156,31 @@ module.exports = {
                 const foundLecturer = await getUser(username);
                 const foundCourse = await findCourse(courseId);
 
-                
-
                 if(!foundLecturer || !foundCourse || foundLecturer.role !== "lecturer")
                 {
-                    result.status = 404;
-                    result.data = {
+                    const notFoundMessage = {
                         message : "Lecturer or course not found"
                     }
-                    return res.status(result.status).json(result.data);
+                    return handleNotFound(res,notFoundMessage);
                 }
 
                 const queryResult = await changeLecturer(foundCourse,foundLecturer);
 
-                result.status = 200;
-                result.data = {
+                const successMessage = {
                     message:`Assigned lecturer ${username} to course ${courseId}`,
                     debugResult: queryResult._id
                 }
-
+                return handleOk(res,successMessage);
             }
             catch {
 
-                result.status = 408
-                result.data = {
+                const failedMessage = {
                     message:"Change lecturer failed"
                 }
-
+                return handleBadRequest(res,failedMessage);
             }
-
-            return res.status(result.status).json(result.data);
     },
     httpRemoveLecturer: async (req,res) => {
-
-        let result = allowStaffOnly(req,res);
-
-        if(result.status === 400) {
-            return res.status(result.status).json(result.data);
-        }
 
         const courseId = req.body.courseId;
 
@@ -301,29 +188,26 @@ module.exports = {
             const foundCourse = await findCourse(courseId);
 
             if(!foundCourse){
-                result.status = 404;
-                    result.data = {
+                const notFoundMessage = {
                         message : "Course not found"
                     }
-                    return res.status(result.status).json(result.data);
+                    return handleNotFound(res,notFoundMessage);
             }
 
             const queryResult = await removeLecturer(foundCourse);
 
-            result.status = 200;
-                result.data = {
+            const successMessage = {
                     message:`Removed lecturer from course ${courseId}`,
                     debugResult: queryResult
                 }
+            return handleOk(res,successMessage);
         }
         catch {
-            result.status = 408
-            result.data = {
+            const failedMessage = {
                 message:"Remove failed"
             }
-
+            return handleBadRequest(res,failedMessage);
         }
-        return res.status(result.status).json(result.data);
     },
 
 }

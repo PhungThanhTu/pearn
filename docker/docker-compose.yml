@@ -9,6 +9,11 @@ services:
     env_file: .env
     ports:
       - 5050:5050
+    environment:
+      - MONGO_CON_STRING=mongodb+srv://phungthanhtu:Phungthanhtu!1@pearn-mongo.ihcdiag.mongodb.net/pearn
+      - ACCESS_TOKEN_SECRET=Iwlakjsklcjzklxjclksjdklasjdlksdjwkldjlaksjkjvkjveifjahwj
+      - ACCESS_TOKEN_LIFE=400m
+      - PORT=5050
     volumes:
       - ../backend:/backend
       - /backend/node_modules

@@ -5,26 +5,38 @@ function getAccessTokenFromHeader(req) {
   return req.headers.authorization;
 }
 
-module.exports = {
-  authorize: async (req, res, next) => {
-    if (req.user) return res.status(400).send("attack detected");
+const handleUnauthorizedError = (res) => res.status(401).json("Unauthorized");
 
-    const accessToken = getAccessTokenFromHeader(req);
-    const secret = process.env.ACCESS_TOKEN_SECRET;
+const handleNoPermissionError = (res,role) => res.status(401).json(`No Permission, required role ${role}`);
+
+module.exports = {
+  authorize: (role) =>{ 
+    return  async (req, res, next) => 
+    {
+      const accessToken = getAccessTokenFromHeader(req);
+      const secret = process.env.ACCESS_TOKEN_SECRET;
+
     if (!accessToken) {
-      return res.status(401).send("unauthorized");
+      return handleUnauthorizedError(res);
     }
 
     const result = await authMethods.verifyToken(accessToken, secret);
 
-    if (!result) return res.status(401).send("unauthorized");
+    if (!result) {
+      return handleUnauthorizedError(res);
+    }
 
     const user = result.payload;
 
-    console.log(user);
+    if(!role)
+      return next();
+
+    if(user.role !== role) return handleNoPermissionError(res,role);
 
     req.user = user;
 
     return next();
-  },
+  }
+}
+
 };

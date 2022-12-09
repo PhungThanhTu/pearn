@@ -10,8 +10,8 @@ router.post('/register',authorize("admin"), userService.register);
 router.post('/login', userService.login);
 router.post('/refresh',userService.refresh);
 router.post('/admin',userService.oneTimeAdminRegister);
-router.post('/password',authorize,userService.changeUserPassword);
-router.put('/profile',authorize,userService.editProfile);
-router.get('/profile',authorize,userService.getProfile);
+router.post('/password',authorize(undefined),userService.changeUserPassword);
+router.put('/profile',authorize(undefined),userService.editProfile);
+router.get('/profile',authorize(undefined),userService.getProfile);
 
 module.exports = router;

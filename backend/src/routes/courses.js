@@ -5,11 +5,12 @@ const { createCourse, getCourse, httpDeleteCourse, httpCreateCourse, httpGetCour
 
 
 router.post('/',authorize("staff"),httpCreateCourse);
-router.get('/:id',authorize,httpGetCourse);
-router.delete('/:id',authorize,httpDeleteCourse);
-router.post('/addStudent',authorize,httpAddStudent);
-router.post('/deleteStudent',authorize,httpRemoveStudent);
-router.post('/addLecturer',authorize,httpAddLecturer);
-router.post('/removeLecturer',authorize,httpRemoveLecturer);
+router.get('/:id',authorize(undefined),httpGetCourse);
+router.delete('/:id',authorize("staff"),httpDeleteCourse);
+router.post('/addStudent',authorize("staff"),httpAddStudent);
+router.post('/deleteStudent',authorize("staff"),httpRemoveStudent);
+router.post('/addLecturer',authorize("staff"),httpAddLecturer);
+router.post('/removeLecturer',authorize("staff"),httpRemoveLecturer);
 
 module.exports = router;
+

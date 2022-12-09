@@ -10,7 +10,7 @@ const handleUnauthorizedError = (res) => res.status(401).json("Unauthorized");
 const handleNoPermissionError = (res,role) => res.status(401).json(`No Permission, required role ${role}`);
 
 module.exports = {
-  authorize: (role) =>{ 
+  authorize: (role = undefined) =>{ 
     return  async (req, res, next) => 
     {
       const accessToken = getAccessTokenFromHeader(req);
@@ -27,13 +27,14 @@ module.exports = {
     }
 
     const user = result.payload;
+    req.user = user;
 
     if(!role)
       return next();
 
     if(user.role !== role) return handleNoPermissionError(res,role);
 
-    req.user = user;
+
 
     return next();
   }

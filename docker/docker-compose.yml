@@ -1,8 +1,9 @@
 version: "3.8"
 
 services:
-  server:
+  pearn-server:
     container_name: "pearn-server"
+    image: pearn_api
     build:
       context: "./../backend"
       dockerfile: "./Dockerfile"

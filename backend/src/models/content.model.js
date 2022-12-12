@@ -8,7 +8,7 @@ const markdownContentSchema = mongoose.Schema({
 })
 
 
-let Block = mongoose.model('markdownContent',courseSchema,'contents');
+let Block = mongoose.model('markdownContent',markdownContentSchema ,'contents');
 
 module.exports = {
     upsertMarkdownContentInBlock: async (block,markdown) => {

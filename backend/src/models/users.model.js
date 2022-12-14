@@ -17,6 +17,7 @@ var UserSchema = mongoose.Schema(
             type: String,
             required: true
         },
+        dateofbirth: Date,
         role:
         {
             type: String,

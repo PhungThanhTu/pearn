@@ -213,12 +213,20 @@ module.exports = {
             });
             return;
         }
+        const parseDateOfBirth = new Date(req.body.dateofbirth);
+
+        if(!parseDateOfBirth)
+            return res.status(408).json({
+                message:"Date of birth is not valid"
+            });
+
         const result = await createNewUser(
             req.body.username,
             req.body.password,
             req.body.fullname,
             req.body.email,
-            req.body.role
+            req.body.role,
+            parseDateOfBirth,
         );
         
         res.status(result.statuscode).send(result.data);

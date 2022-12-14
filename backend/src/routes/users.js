@@ -4,7 +4,7 @@ const { authorize } = require('../middlewares/auth.middleware');
 const { getAllUsers } = require('../services/users.services');
 
 /* GET users listing. */
-router.get('/', authorize, getAllUsers);
+router.get('/', authorize("admin"), getAllUsers);
 
 
 module.exports = router;

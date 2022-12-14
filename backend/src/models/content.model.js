@@ -8,11 +8,17 @@ const markdownContentSchema = mongoose.Schema({
 })
 
 
-let Block = mongoose.model('markdownContent',courseSchema,'contents');
+let MarkdownContent = mongoose.model('markdownContent',courseSchema,'contents');
 
 module.exports = {
     upsertMarkdownContentInBlock: async (block,markdown) => {
-        // TODO: upsert block data
+        if(!block.content) {
+            const newContent = new MarkdownContent({
+                content: markdown
+            });
+            
+
+        }
     },
     deleteMarkdownContentInBlock: async (block) => {
         //TODO: delete both content in block and block itself

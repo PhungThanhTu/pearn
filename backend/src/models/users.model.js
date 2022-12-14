@@ -28,6 +28,7 @@ var UserSchema = mongoose.Schema(
             ],
             required: true
         },
+        dateofbirth:Date,
         refreshtoken: String,
         avatar: String
     }

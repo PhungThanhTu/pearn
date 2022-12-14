@@ -1,10 +1,7 @@
 const { insertCourse, findCourse, deleteCourse, addStudentToCourse, changeLecturer, removeLecturer, checkStudentInCourse, removeStudent} = require("../models/courses.model");
 const { getUser } = require("../models/users.model");
 
-const handleCreated = (res,data) => res.status(201).json(data);
-const handleBadRequest = (res,err) => res.status(400).json(err);
-const handleOk = (res,data) => res.status(200).json(data);
-const handleNotFound = (res,err) => res.status(404).json(err);
+const {handleBadRequest,handleCreated,handleNotFound,handleOk} = require('../lib/responseMessage')
 
 module.exports = {
     httpCreateCourse: async (req,res) => {

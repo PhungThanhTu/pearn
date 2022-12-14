@@ -7,7 +7,7 @@ function getAccessTokenFromHeader(req) {
 
 const handleUnauthorizedError = (res) => res.status(401).json("Unauthorized");
 
-const handleNoPermissionError = (res,role) => res.status(401).json(`No Permission, required role ${role}`);
+const handleNoPermissionError = (res,role) => res.status(403).json(`No Permission, required role ${role}`);
 
 module.exports = {
   authorize: (role = undefined) =>{ 

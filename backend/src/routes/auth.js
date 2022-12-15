@@ -13,6 +13,6 @@ router.post('/admin',userService.oneTimeAdminRegister);
 router.post('/password',authorize(undefined),userService.changeUserPassword);
 router.put('/profile',authorize(undefined),userService.editProfile);
 router.get('/profile',authorize(undefined),userService.getProfile);
-router.delete('/delete',authorize("admin",userService.delete));
+router.delete('/delete',authorize("admin"),userService.delete);
 
 module.exports = router;

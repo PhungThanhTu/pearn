@@ -11,16 +11,22 @@ const markdownContentSchema = mongoose.Schema({
 let MarkdownContent = mongoose.model('markdownContent',courseSchema,'contents');
 
 module.exports = {
-    upsertMarkdownContentInBlock: async (block,markdown) => {
-        if(!block.content) {
-            const newContent = new MarkdownContent({
-                content: markdown
-            });
-            
-
-        }
+    createMarkdownContent: async (markdown) => {
+        const newContent = new MarkdownContent({
+            content: markdown
+        });
+        const result = await newContent.save();
+        return result._id;
     },
-    deleteMarkdownContentInBlock: async (block) => {
+    updateMarkdownContent: async (id,markdown) => {
+        const result = await MarkdownContent.findByIdAndUpdate(id,{
+            content:markdown
+        },{
+            new:true
+        });
+        return result;
+    },
+    deleteMarkdownContent: async (id) => {
         //TODO: delete both content in block and block itself
     },
     getContent: async (block) => {

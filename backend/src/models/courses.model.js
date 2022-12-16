@@ -73,9 +73,9 @@ module.exports = {
         return deleteResult;
     },
     // additional function for optimization
-    addStudentToCourse: async (course,student) => {
+    addStudentToCourse: async (course,students) => {
 
-        course.students.push(student);
+        course.students.push(students);
 
         const result = await course.save()
 
@@ -98,9 +98,9 @@ module.exports = {
         return result;
     }
     ,
-    removeStudent: async (course, student) => {
+    removeStudent: async (course, students) => {
 
-        course.students.pull(student);
+        course.students.pull(students);
         const result = await course.save();
 
         console.info("REMOVING STUDENT");

@@ -85,5 +85,8 @@ module.exports = {
             console.log(`update failed due to error ${err}`);
             return false;
         }
+    },
+    populateUserWithUsername: async (usernames) => {
+        return await User.find().where('username').in(usernames).exec();
     }
 }

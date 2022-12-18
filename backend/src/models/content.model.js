@@ -8,7 +8,7 @@ const markdownContentSchema = mongoose.Schema({
 })
 
 
-let MarkdownContent = mongoose.model('markdownContent',courseSchema,'contents');
+let MarkdownContent = mongoose.model('markdownContent',markdownContentSchema,'contents');
 
 module.exports = {
     createMarkdownContent: async (markdown) => {
@@ -27,9 +27,11 @@ module.exports = {
         return result;
     },
     deleteMarkdownContent: async (id) => {
-        //TODO: delete both content in block and block itself
+        const result = await MarkdownContent.findByIdAndDelete(id);
+        return result;
     },
-    getContent: async (block) => {
-        //TODO: retrieve content info when call
+    getMarkdownContent: async (id) => {
+        const result = await MarkdownContent.findById(id);
+        return result;
     }
 }

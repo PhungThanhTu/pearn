@@ -15,15 +15,15 @@ const swaggerUi = require('swagger-ui-express');
 const { swaggerJson } = require('./src/utils/swagger.utils');
 require('dotenv').config();
 
+const connectionString = process.env.MONGO_CON_STRING;
+const host = connectionString.split('@')[1];
 
-// connect to mongo
-console.log(process.env.MONGO_CON_STRING);
 mongoose
   .connect(
-    process.env.MONGO_CON_STRING,
+    connectionString,
     { useNewUrlParser: true }
   )
-  .then(() => console.log('MongoDB Connected'))
+  .then(() => console.log(`MongoDB Connected at ${host}`))
   .catch(err => console.log(err));
 console.log(mongoose.connection.readyState);
 var app = express();

@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const { authorize } = require('../middlewares/auth.middleware');
-const { createCourse, getCourse, httpDeleteCourse, httpCreateCourse, httpGetCourse, httpAddStudent, httpRemoveStudent, httpAddLecturer, httpRemoveLecturer, httpGetCourses } = require('../services/courses.service');
+const { httpDeleteCourse, httpCreateCourse, httpGetCourse, httpAddStudent, httpRemoveStudent, httpAddLecturer, httpRemoveLecturer, httpGetCourses } = require('../services/courses.service');
 
 
 router.post('/',authorize("staff"),httpCreateCourse);

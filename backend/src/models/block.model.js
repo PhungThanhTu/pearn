@@ -41,19 +41,13 @@ module.exports = {
     },
     createBlock: async (course,blockName,type)  => {
         const newBlock = new Block({
-<<<<<<< HEAD
             name: blockName,
             course: course._id,
-=======
-            course: course._id,
-            name: blockName,
->>>>>>> feature/course-enhancement
             type: type
         });
         const result = await newBlock.save();
         return result._id.toString();
     },
-<<<<<<< HEAD
     deleteBlock: async (blockId) => {
         const result = await Block.deleteOne({_id:blockId});
         return result;
@@ -61,16 +55,5 @@ module.exports = {
     getAllBlockInCourse: async (course) => {
         const blocks = await Block.find({course:course._id});
         return blocks;
-=======
-    deleteBlock: async (block) => {
-        const result = await Block.deleteOne({_id:block._id});
-        return result;
-    },
-    getAllBlockInCourse: async (courseId) => {
-        const result = await Block.find({
-            course:courseId
-        });
-        return result;
->>>>>>> feature/course-enhancement
     },
 }

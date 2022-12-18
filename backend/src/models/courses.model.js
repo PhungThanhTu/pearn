@@ -75,14 +75,47 @@ module.exports = {
     // additional function for optimization
     addStudentToCourse: async (course,student) => {
 
-        course.students.push(student);
+        course.students.push(student)
 
         const result = await course.save()
 
+        return result;
+    },
+    addStudentsToCourse: async (course,students) => {
 
+        const result = await Course.updateOne(
+        {
+            _id:course._id
+        },
+        {
+            $push:{
+                students: {
+                    $each:[...students]
+                }
+            }
+        });
+
+        console.log(result);
 
         return result;
     },
+    removeStudentsFromCourse: async (course,students) => {
+        
+            const result = await Course.updateOne(
+            {
+                _id:course._id
+            },
+            {
+                $pullAll:{
+                    students: [...students]
+                    
+                }
+            });
+    
+            console.log(result);
+    
+            return result;
+        },
     checkStudentInCourse: async (course,user) => {
         const query = await Course.find({
             _id: course._id,
@@ -96,6 +129,12 @@ module.exports = {
         const result = query.length;
 
         return result;
+    },
+    getStudentsInCourse: async (course) => {
+        const query = await Course.findOne({
+            _id: course._id
+        });
+        return query.students;
     }
     ,
     removeStudent: async (course, student) => {

@@ -30,7 +30,9 @@ const blockSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         refPath: 'contentType'
     },
-})
+});
+
+
 
 
 let Block = mongoose.model('block',blockSchema,'blocks');

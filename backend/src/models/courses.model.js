@@ -53,7 +53,15 @@ module.exports = {
         return course;
     },
     getCourses: async (query) => {
-        return await Course.find(query);
+        return await Course.find(query).populate('students',{
+            _id:0,
+            username:1,
+            fullname:1
+        }).populate('lecturer',{
+            _id:0,
+            username:1,
+            fullname:1
+        });
     },
     updateCourse: async (courseId, {name,locked}) => {
         const result = await Course.findByIdAndUpdate(courseId,{

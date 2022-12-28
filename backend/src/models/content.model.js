@@ -8,11 +8,7 @@ const markdownContentSchema = mongoose.Schema({
 })
 
 
-<<<<<<< HEAD
-let Block = mongoose.model('markdownContent',markdownContentSchema ,'contents');
-=======
 let MarkdownContent = mongoose.model('markdownContent',markdownContentSchema,'contents');
->>>>>>> feature/course-enhancement
 
 module.exports = {
     createMarkdownContent: async (markdown) => {

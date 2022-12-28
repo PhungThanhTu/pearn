@@ -5,11 +5,19 @@ const blockSchema = mongoose.Schema({
         required: true,
         type: String,
     },
-    type: {
-        required:true,
+    blockType: {
+        required: true,
+        type: String,
         enum: [
             "common",
             "exercise"
+        ]
+    },
+    contentType: {
+        required: true,
+        type: String,
+        enum: [
+            'markdownContent'
         ]
     },
     course:{   
@@ -18,17 +26,10 @@ const blockSchema = mongoose.Schema({
         ref: 'course'
     },
     content:{
-        required: false,
+        required: true,
         type: mongoose.Schema.Types.ObjectId,
-        refPath: contentTypes
+        refPath: 'contentType'
     },
-    contentTypes:{
-        required:true,
-        type: String,
-        enum: [
-            'markdownContent'
-        ]
-    }
 })
 
 
@@ -36,24 +37,29 @@ let Block = mongoose.model('block',blockSchema,'blocks');
 
 module.exports = {
     getBlockById: async (id) => {
-        const result = await Block.findById(id);
+        const result = await Block.find({
+            _id: id
+        }).populate('content');
         return result;
     },
-    createBlock: async (course,blockName,type)  => {
+    createBlock: async (courseId,blockName,blockType,contentType,contentId)  => {
         const newBlock = new Block({
             name: blockName,
-            course: course._id,
-            type: type
+            course: mongoose.Types.ObjectId(courseId),
+            blockType: blockType,
+            contentType: contentType,
+            content: mongoose.Types.ObjectId(contentId)
         });
         const result = await newBlock.save();
-        return result._id.toString();
+        return result._id;
     },
     deleteBlock: async (blockId) => {
         const result = await Block.deleteOne({_id:blockId});
         return result;
     },
-    getAllBlockInCourse: async (course) => {
-        const blocks = await Block.find({course:course._id});
+    getAllBlockInCourse: async (courseId) => {
+        const blocks = await Block.find({course:mongoose.Types.ObjectId(courseId)})
+        .populate('content');
         return blocks;
     },
 }

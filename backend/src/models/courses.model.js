@@ -44,11 +44,14 @@ module.exports = {
         return result._id.toString();
     },
     findCourse: async (courseId) => {
-        const course = await Course.findById(courseId).populate('students',{
+
+        const population =  {
             _id:0,
             username:1,
             fullname:1
-        });
+        };
+
+        const course = await Course.findById(courseId).populate('students',population).populate('lecturer',population);
 
         return course;
     },

@@ -189,7 +189,8 @@ const getSingleUserProfile = async (username) => {
             fullname:user.fullname,
             email:user.email,
             role: user.role,
-            avatar:user.avatar
+            avatar:user.avatar,
+            dateofbirth: user.dateofbirth
         }
     }
     return successResult;

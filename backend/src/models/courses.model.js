@@ -48,7 +48,9 @@ module.exports = {
         const population =  {
             _id:0,
             username:1,
-            fullname:1
+            fullname:1,
+            email: 1,
+            role:1
         };
 
         const course = await Course.findById(courseId).populate('students',population).populate('lecturer',population);

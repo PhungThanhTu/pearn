@@ -7,6 +7,11 @@ const submissionSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'block'
     },
+    course: {
+        required: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'course'
+    },
     studentUsername: {
         required: true,
         type: String
@@ -18,7 +23,7 @@ const submissionSchema = mongoose.Schema({
             "markdown"
         ]
     },
-    markdownSubmission: {
+    submission: {
         required: true,
         type: String
     },
@@ -32,5 +37,23 @@ const submissionSchema = mongoose.Schema({
 let Submission = mongoose.model('submission',submissionSchema,'sumissions')
 
 module.exports = {
+    submit: async (blockId,courseId,student,type,content) => {
+
+    },
+    updateSubmit: async (blockId,student,content) => {
+
+    },
+    removeSumission: async (blockId,student) => {
+
+    },
+    getSubmission: async (id) => {
+
+    },
+    gradeSubmission: async (id, score) => {
+
+    },
+    getScoreObject: async (student,course) => {
+
+    }
     
 }

@@ -1,29 +1,34 @@
 const mongoose = require('mongoose');
 
-const submissionSchema = mongoose.Schema({
+const scoreMetadata = mongoose.Schema({
 
     block: {
         required: true,
         type: mongoose.Schema.Types.ObjectId,
         ref: 'block'
     },
-    studentUsername: {
+    course: {
         required: true,
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'course'
     },
-    markdownSubmission: {
-        required: true,
-        type: String
-    },
-    scoreOfTen: {
+    scoreWeight:{
         required: true,
         type: Number,
         default: 0
     }
 })
 
-let Submission = mongoose.model('submission',submissionSchema,'sumissions');
+let ScoreMetadata = mongoose.model('scoreMeta',submissionSchema,'scoreMeta');
 
 module.exports = {
-    
+    createScoreMeta: async (blockId, courseId, initialWeight) => {
+
+    },
+    setWeightForBlock: async (blockId, weight) => {
+
+    },
+    getWeightObject: async (courseId) => {
+
+    }
 }

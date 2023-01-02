@@ -56,7 +56,7 @@ module.exports = {
         })
     ,
     getStudents: async () => await User.find({
-        role: "students"
+        role: "student"
         },{
         username:1,
         fullname:1,

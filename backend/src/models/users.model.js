@@ -55,6 +55,15 @@ module.exports = {
         role:1
         })
     ,
+    getStudents: async () => await User.find({
+        role: "students"
+        },{
+        username:1,
+        fullname:1,
+        email:1,
+        role:1
+        })
+    ,
     createUser: async (user) => {
         let newUser = new User(user);
         try {

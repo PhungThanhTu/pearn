@@ -3,7 +3,7 @@ const metaModel = require('../models/metadata.model')
 const bcrypt = require('bcrypt');
 const { generateToken, decodeToken } = require('../lib/token.methods');
 const randToken = require('rand-token');
-const { getUser, updateUser, deleteUser, getUsers, getLecturers } = require('../models/users.model');
+const { getUser, updateUser, deleteUser, getUsers, getLecturers, getStudents } = require('../models/users.model');
 
 
 const hashPassword = async (rawPassword) => {
@@ -381,6 +381,10 @@ module.exports = {
     },
     getAllLecturers: async (req,res) => {
         const users = await getLecturers();
+        return res.status(200).json(users);
+    },
+    getAllStudents: async (req,res) => {
+        const users = await getStudents();
         return res.status(200).json(users);
     }
 

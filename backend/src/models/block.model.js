@@ -30,14 +30,16 @@ const blockSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         refPath: 'contentType'
     },
-})
+});
+
+
 
 
 let Block = mongoose.model('block',blockSchema,'blocks');
 
 module.exports = {
     getBlockById: async (id) => {
-        const result = await Block.find({
+        const result = await Block.findOne({
             _id: id
         }).populate('content');
         return result;

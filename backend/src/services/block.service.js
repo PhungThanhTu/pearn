@@ -1,6 +1,7 @@
 const { createBlock, getBlockById, getAllBlockInCourse, deleteBlock } = require("../models/block.model")
 const { deleteMarkdownContent, createMarkdownContent, updateMarkdownContent } = require("../models/content.model")
 const {handleOk, handleNotFound} = require('../lib/responseMessage');
+const { createScoreMeta } = require("../models/scoreMetadata.model");
 
 const BlockContentDeletionExecutions = {
     "markdownContent": async (id) => {
@@ -37,6 +38,31 @@ module.exports = {
         return handleOk(res,newBlock);
         
     },
+    httpCreateMarkdownExerciseBlock: async (req,res) => {
+        const name = req.body.name;
+        const contentType = "markdownContent";
+        const blockType = "exercise";
+        const courseId = req.body.courseId;
+        const markdown = req.body.markdown;
+
+        const newMarkdowncontent = await createMarkdownContent(markdown);
+
+        console.info("Markdown Content Created");
+        console.log(newMarkdowncontent);
+
+        const newBlock = await createBlock(courseId,name,blockType,contentType,newMarkdowncontent);
+
+        const newScoreMeta = await createScoreMeta(newBlock,courseId,0);
+
+        console.info("New Exercise created");
+        console.log(newScoreMeta);
+
+        console.info("New block created");
+        console.log(newBlock);
+
+        return handleOk(res,newBlock);
+        
+    },
     httpGetBlock: async (req,res) => {
         const block = await getBlockById(req.params.id);
 
@@ -54,7 +80,7 @@ module.exports = {
         console.log(updatingMarkdown);
 
         const foundBlock = await findBlock(blockId,res);
-        const markdownId = foundBlock[0].content._id;
+        const markdownId = foundBlock.content._id;
 
         console.info("FOUND BLOCK DETAILS:");
         console.log(foundBlock);
@@ -88,8 +114,8 @@ module.exports = {
 
         console.log(block);
 
-        const contentId = block[0].content._id;
-        const contentType = block[0].contentType;
+        const contentId = block.content._id;
+        const contentType = block.contentType;
 
         const contentDeleteResult = await BlockContentDeletionExecutions[contentType](contentId);
         

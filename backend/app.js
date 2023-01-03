@@ -11,6 +11,7 @@ var authRouter = require('./src/routes/auth');
 var imageRouter = require('./src/routes/image');
 var courseRouter = require('./src/routes/courses');
 var blockRouter = require('./src/routes/block');
+var scoreRouter = require('./src/routes/score');
 var mongoose = require('mongoose');
 const swaggerUi = require('swagger-ui-express');
 const { swaggerJson } = require('./src/utils/swagger.utils');
@@ -47,6 +48,7 @@ app.use('/auth', authRouter);
 app.use('/image', imageRouter);
 app.use('/course',courseRouter);
 app.use('/block',blockRouter);
+app.use('/score',scoreRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

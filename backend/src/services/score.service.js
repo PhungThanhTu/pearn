@@ -100,5 +100,16 @@ module.exports = {
         const result = await getAllScoreByCourse(courseId);
 
         return handleOk(res,result);
+    },
+    httpGetWeight: async (req,res) => {
+        const blockId = req.params.blockId;
+
+        const foundBlock = await getBlockById(blockId);
+
+        if(!foundBlock) return handleNotFound(res,"Not found");
+
+        const result = await getWeightOfBlock(blockId);
+
+        return handleOk(res,result);
     }
 }

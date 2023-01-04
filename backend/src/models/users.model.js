@@ -28,6 +28,7 @@ var UserSchema = mongoose.Schema(
             ],
             required: true
         },
+        dateofbirth:Date,
         refreshtoken: String,
         avatar: String
     }
@@ -45,6 +46,24 @@ module.exports = {
             role:1
         });
     },
+    getLecturers: async () => await User.find({
+        role: "lecturer"
+        },{
+        username:1,
+        fullname:1,
+        email:1,
+        role:1
+        })
+    ,
+    getStudents: async () => await User.find({
+        role: "student"
+        },{
+        username:1,
+        fullname:1,
+        email:1,
+        role:1
+        })
+    ,
     createUser: async (user) => {
         let newUser = new User(user);
         try {
@@ -84,5 +103,8 @@ module.exports = {
             console.log(`update failed due to error ${err}`);
             return false;
         }
+    },
+    populateUserWithUsername: async (usernames) => {
+        return await User.find().where('username').in(usernames).exec();
     }
 }

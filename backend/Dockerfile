@@ -7,5 +7,5 @@ COPY . .
 EXPOSE 5050
 RUN chown -R node /backend
 USER node
-CMD ["npm", "dev"]
+CMD ["npm", "start"]
 

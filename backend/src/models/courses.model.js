@@ -44,16 +44,29 @@ module.exports = {
         return result._id.toString();
     },
     findCourse: async (courseId) => {
-        const course = await Course.findById(courseId).populate('students',{
+
+        const population =  {
             _id:0,
             username:1,
-            fullname:1
-        });
+            fullname:1,
+            email: 1,
+            role:1
+        };
+
+        const course = await Course.findById(courseId).populate('students',population).populate('lecturer',population);
 
         return course;
     },
     getCourses: async (query) => {
-        return await Course.find(query);
+        return await Course.find(query).populate('students',{
+            _id:0,
+            username:1,
+            fullname:1
+        }).populate('lecturer',{
+            _id:0,
+            username:1,
+            fullname:1
+        });
     },
     updateCourse: async (courseId, {name,locked}) => {
         const result = await Course.findByIdAndUpdate(courseId,{
@@ -75,14 +88,47 @@ module.exports = {
     // additional function for optimization
     addStudentToCourse: async (course,student) => {
 
-        course.students.push(student);
+        course.students.push(student)
 
         const result = await course.save()
 
+        return result;
+    },
+    addStudentsToCourse: async (course,students) => {
 
+        const result = await Course.updateOne(
+        {
+            _id:course._id
+        },
+        {
+            $push:{
+                students: {
+                    $each:[...students]
+                }
+            }
+        });
+
+        console.log(result);
 
         return result;
     },
+    removeStudentsFromCourse: async (course,students) => {
+        
+            const result = await Course.updateOne(
+            {
+                _id:course._id
+            },
+            {
+                $pullAll:{
+                    students: [...students]
+                    
+                }
+            });
+    
+            console.log(result);
+    
+            return result;
+        },
     checkStudentInCourse: async (course,user) => {
         const query = await Course.find({
             _id: course._id,
@@ -96,6 +142,12 @@ module.exports = {
         const result = query.length;
 
         return result;
+    },
+    getStudentsInCourse: async (course) => {
+        const query = await Course.findOne({
+            _id: course._id
+        });
+        return query.students;
     }
     ,
     removeStudent: async (course, student) => {

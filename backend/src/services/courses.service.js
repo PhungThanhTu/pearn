@@ -1,10 +1,7 @@
-const { insertCourse, findCourse, deleteCourse, addStudentToCourse, changeLecturer, removeLecturer, checkStudentInCourse, removeStudent} = require("../models/courses.model");
-const { getUser } = require("../models/users.model");
+const { insertCourse, findCourse, deleteCourse, addStudentToCourse, changeLecturer, removeLecturer, checkStudentInCourse, removeStudent, getStudentsInCourse, addStudentsToCourse, getCourses, removeStudentsFromCourse} = require("../models/courses.model");
+const { getUser, populateUserWithUsername } = require("../models/users.model");
 
-const handleCreated = (res,data) => res.status(201).json(data);
-const handleBadRequest = (res,err) => res.status(400).json(err);
-const handleOk = (res,data) => res.status(200).json(data);
-const handleNotFound = (res,err) => res.status(404).json(err);
+const {handleBadRequest,handleCreated,handleNotFound,handleOk, handleNotAllowed} = require('../lib/responseMessage')
 
 module.exports = {
     httpCreateCourse: async (req,res) => {
@@ -27,6 +24,8 @@ module.exports = {
 
         const courseId = req.params.id;
 
+        if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
+
         const course = await findCourse(courseId);
 
         if(!course) return handleNotFound(res,{
@@ -38,6 +37,8 @@ module.exports = {
     httpDeleteCourse: async (req,res) => {
         
         const courseId = req.params.id;
+        if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
+
         try {
             const deleteResult = await deleteCourse(courseId);
 
@@ -58,37 +59,38 @@ module.exports = {
     },
     httpAddStudent: async (req,res) => {
 
-            const username = req.body.username;
+            const usernames = req.body.usernames;
             const courseId = req.body.courseId;
 
+            if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
+
             try {
-                const foundStudent = await getUser(username);
+
+                console.log(usernames);
+
+                const foundUsers = await populateUserWithUsername(usernames);
+                const foundStudents = [...foundUsers].filter(user => user.role === "student");
                 const foundCourse = await findCourse(courseId);
-
                 
+                if([...foundStudents].length === 0 || !foundCourse) return handleNotFound(res,"Not found");
 
-                if(!foundStudent || !foundCourse || foundStudent.role !== "student")
-                {
-                    const notFoundMessage = {
-                        message : "Student or course not found"
-                    }
-                    return handleNotFound(res,notFoundMessage);
-                }
+                const studentsInCourse = await getStudentsInCourse(foundCourse);
+                const studentsInCourseIdsInString = [...studentsInCourse].map(student => student._id.toString());
+                const finalInsertData = foundStudents.filter(student => !studentsInCourseIdsInString.includes(student._id.toString()));
 
-                const isAlreadyAdded = await checkStudentInCourse(foundCourse,foundStudent);
+                console.log("Student currently in course");
+                console.log(studentsInCourseIdsInString);
+                console.log("Filtered Data");
+                console.log(finalInsertData);
 
-                if(isAlreadyAdded)
-                {
-                    const alreadyAddedMessage = {
-                        message : "Student has already in course"
-                    }
-                    return handleBadRequest(res,alreadyAddedMessage);
-                }
-
-                const queryResult = await addStudentToCourse(foundCourse,foundStudent);
+                const queryResult = await addStudentsToCourse(foundCourse,finalInsertData);
+                
+                if(finalInsertData.length === 0) return handleBadRequest(res,"Students has been already added into the course");
+ 
+                const messageResult = `Added student ${finalInsertData.map(student => student.username)} to course ${foundCourse.code}`
 
                 const addedSuccessMessage = {
-                    message:`Added student ${username} to course ${courseId}`,
+                    message:messageResult,
                     debugResult: queryResult._id
                 }
 
@@ -106,51 +108,58 @@ module.exports = {
     },
     httpRemoveStudent: async (req,res) => {
 
-            const username = req.body.username;
-            const courseId = req.body.courseId;
+        const usernames = req.body.usernames;
+        const courseId = req.body.courseId;
 
-            try {
-                const foundStudent = await getUser(username);
-                const foundCourse = await findCourse(courseId);
+        if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
 
-                if(!foundStudent || !foundCourse || foundStudent.role !== "student")
-                {
-                    result.status = 404;
-                    result.data = {
-                        message : "Student or course not found"
-                    }
-                    return res.status(result.status).json(result.data);
-                }
+        try {
 
-                const isAlreadyAdded = await checkStudentInCourse(foundCourse,foundStudent);
+            console.log(usernames);
 
-                if(!isAlreadyAdded)
-                {
-                    const notAddedMessage = {
-                        message : "Student hasn't been added to the course"
-                    }
-                    return handleBadRequest(res,notAddedMessage);
-                }
+            const foundUsers = await populateUserWithUsername(usernames);
+            const foundStudents = [...foundUsers].filter(user => user.role === "student");
+            const foundCourse = await findCourse(courseId);
+            
+            if([...foundStudents].length === 0 || !foundCourse) return handleNotFound(res,"Not found");
 
-                const queryResult = await removeStudent(foundCourse,foundStudent);
+            const studentsInCourse = await getStudentsInCourse(foundCourse);
+            const studentsInCourseIdsInString = [...studentsInCourse].map(student => student._id.toString());
+            const finalDeleteData = foundStudents.filter(student => studentsInCourseIdsInString.includes(student._id.toString()));
 
-                const removedSuccessMessage = {
-                    message:`Removed student ${username} from course ${courseId}`,
-                    debugResult: queryResult._id
-                }
-                return handleOk(res,removedSuccessMessage);
+            console.log("Student currently in course");
+            console.log(studentsInCourseIdsInString);
+            console.log("Filtered Data");
+            console.log(finalDeleteData);
+
+            const queryResult = await removeStudentsFromCourse(foundCourse,finalDeleteData)
+            
+            if(finalDeleteData.length === 0) return handleBadRequest(res,"Students has been alread removed from the course");
+
+            const messageResult = `Removed student ${finalDeleteData.map(student => student.username)} from course ${foundCourse.code}`
+
+            const removedSuccessMessage = {
+                message:messageResult,
+                debugResult: queryResult._id
             }
-            catch {
-                const failedMessage = {
-                    message:"Deletion failed"
-                }
-                return handleBadRequest(res,failedMessage);
+
+            return handleOk(res,removedSuccessMessage);
+
+        }
+        catch {
+            const removeFailedMessage = {
+                message:"Remove failed"
             }
+
+            return handleBadRequest(res,removeFailedMessage);
+        }
     },
     httpAddLecturer: async (req,res) => {
 
             const username = req.body.username;
             const courseId = req.body.courseId;
+
+            if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
 
             try {
                 const foundLecturer = await getUser(username);
@@ -184,6 +193,8 @@ module.exports = {
 
         const courseId = req.body.courseId;
 
+        if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
+
         try {
             const foundCourse = await findCourse(courseId);
 
@@ -209,5 +220,28 @@ module.exports = {
             return handleBadRequest(res,failedMessage);
         }
     },
+    httpGetCourses: async (req,res) => {
 
+        const identity = await getUser(req.user.username);
+
+        if(req.user.role === "lecturer")
+        {
+            const result = await getCourses({
+                lecturer: identity._id
+            })
+            return handleOk(res,result);
+        }
+        if(req.user.role === "student")
+        {
+            const result = await getCourses({
+                students: identity._id
+            });
+            return handleOk(res,result);
+        }
+        if(req.user.role === "staff"){
+            const result = await getCourses({});
+            return handleOk(res,result);
+        }
+        else return handleNotAllowed(res);
+    }
 }

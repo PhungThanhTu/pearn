@@ -1,25 +1,20 @@
 version: "3.8"
 
 services:
-  mongo :
-    container_name: "pearn-mongo-db"
-    image: "mongo"
-    env_file:
-      - .env
-    volumes:
-      - ../database/mongo:/data/db
-    ports:
-      - "27017:27017"
-  server:
+  pearn-server:
     container_name: "pearn-server"
+    image: pearn_api
     build:
       context: "./../backend"
       dockerfile: "./Dockerfile"
     env_file: .env
     ports:
       - 5050:5050
-    depends_on: 
-      - mongo
+    environment:
+      - MONGO_CON_STRING=mongodb+srv://phungthanhtu:Phungthanhtu!1@cluster0.ylzeo0f.mongodb.net/pearn
+      - ACCESS_TOKEN_SECRET=Iwlakjsklcjzklxjclksjdklasjdlksdjwkldjlaksjkjvkjveifjahwj
+      - ACCESS_TOKEN_LIFE=400m
+      - PORT=5050
     volumes:
       - ../backend:/backend
       - /backend/node_modules

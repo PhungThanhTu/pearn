@@ -3,7 +3,7 @@ const metaModel = require('../models/metadata.model')
 const bcrypt = require('bcrypt');
 const { generateToken, decodeToken } = require('../lib/token.methods');
 const randToken = require('rand-token');
-const { getUser, updateUser, deleteUser, getUsers } = require('../models/users.model');
+const { getUser, updateUser, deleteUser, getUsers, getLecturers, getStudents } = require('../models/users.model');
 
 
 const hashPassword = async (rawPassword) => {
@@ -186,11 +186,11 @@ const getSingleUserProfile = async (username) => {
     const successResult = {
         statuscode:200,
         data:{
-            username:user.username,
             fullname:user.fullname,
             email:user.email,
             role: user.role,
-            avatar:user.avatar
+            avatar:user.avatar,
+            dateofbirth: user.dateofbirth
         }
     }
     return successResult;
@@ -214,12 +214,20 @@ module.exports = {
             });
             return;
         }
+        const parseDateOfBirth = new Date(req.body.dateofbirth);
+
+        if(!parseDateOfBirth)
+            return res.status(408).json({
+                message:"Date of birth is not valid"
+            });
+
         const result = await createNewUser(
             req.body.username,
             req.body.password,
             req.body.fullname,
             req.body.email,
-            req.body.role
+            req.body.role,
+            parseDateOfBirth,
         );
         
         res.status(result.statuscode).send(result.data);
@@ -365,15 +373,19 @@ module.exports = {
             })
     },
     getAllUsers: async (req,res) => {
-        const role = req.user.role;
-
-        if(role !== "admin")
-            return res.status(401).json("Unauthorized");
         
         const users = await getUsers();
 
         return res.status(200).json(users);
         
+    },
+    getAllLecturers: async (req,res) => {
+        const users = await getLecturers();
+        return res.status(200).json(users);
+    },
+    getAllStudents: async (req,res) => {
+        const users = await getStudents();
+        return res.status(200).json(users);
     }
 
 }

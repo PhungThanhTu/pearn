@@ -24,6 +24,8 @@ module.exports = {
 
         const courseId = req.params.id;
 
+        if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
+
         const course = await findCourse(courseId);
 
         if(!course) return handleNotFound(res,{
@@ -35,6 +37,8 @@ module.exports = {
     httpDeleteCourse: async (req,res) => {
         
         const courseId = req.params.id;
+        if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
+
         try {
             const deleteResult = await deleteCourse(courseId);
 
@@ -57,6 +61,8 @@ module.exports = {
 
             const usernames = req.body.usernames;
             const courseId = req.body.courseId;
+
+            if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
 
             try {
 
@@ -105,6 +111,8 @@ module.exports = {
         const usernames = req.body.usernames;
         const courseId = req.body.courseId;
 
+        if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
+
         try {
 
             console.log(usernames);
@@ -151,6 +159,8 @@ module.exports = {
             const username = req.body.username;
             const courseId = req.body.courseId;
 
+            if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
+
             try {
                 const foundLecturer = await getUser(username);
                 const foundCourse = await findCourse(courseId);
@@ -182,6 +192,8 @@ module.exports = {
     httpRemoveLecturer: async (req,res) => {
 
         const courseId = req.body.courseId;
+
+        if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
 
         try {
             const foundCourse = await findCourse(courseId);

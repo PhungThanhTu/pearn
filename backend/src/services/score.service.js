@@ -9,6 +9,7 @@ const { populateUserWithUsername } = require("../models/users.model");
 module.exports = {
     httpSetWeight: async (req,res) => {
         const blockId = req.params.blockId;
+        if(!validateGuid(blockId)) return handleNotFound(res,"Invalid GUID");
 
         const weight = req.body.weight;
 
@@ -27,6 +28,8 @@ module.exports = {
         const student = req.params.username;
         const courseId = req.params.courseId;
 
+        if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
+
         const foundStudent = await populateUserWithUsername(student);
         const foundCourse = await findCourse(courseId);
 
@@ -41,6 +44,8 @@ module.exports = {
     },
     httpGradeSubmission: async (req,res) => {
         const submissionId = req.params.id;
+
+        if(!validateGuid(submissionId)) return handleNotFound(res,"Invalid GUID");
 
         const score = req.body.score;
 
@@ -61,6 +66,8 @@ module.exports = {
     httpGetAllSubmissionByBlock: async (req,res) => {
         const blockId = req.params.blockId;
 
+        if(!validateGuid(blockId)) return handleNotFound(res,"Invalid GUID");
+
         const result = await getAllSubmissionByBlock(blockId);
         if(!result) return handleNotFound(res,"Not found");
 
@@ -70,6 +77,8 @@ module.exports = {
         const studentUsername = req.user.username;
 
         const blockId = req.params.blockId;
+
+        if(!validateGuid(blockId)) return handleNotFound(res,"Invalid GUID");
 
         const foundBlock = await getBlockById(blockId);
 
@@ -89,13 +98,18 @@ module.exports = {
 
     },
     httpGetSubmissionById: async (req,res) => {
-        const result = await getSubmission(req.params.id);
+
+        const submissionId = req.params.id;
+        if(!validateGuid(submissionId)) return handleNotFound(res,"Invalid GUID");
+
+        const result = await getSubmission(submissionId);
         if(!result) return handleNotFound(res,"Not found");
         return handleOk(res,result);
     },
     httpGetAllStudentScoreInCourse: async (req,res) => {
         
         const courseId = req.params.courseId;
+        if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
 
         const result = await getAllScoreByCourse(courseId);
 
@@ -103,6 +117,7 @@ module.exports = {
     },
     httpGetWeight: async (req,res) => {
         const blockId = req.params.blockId;
+        if(!validateGuid(blockId)) return handleNotFound(res,"Invalid GUID");
 
         const foundBlock = await getBlockById(blockId);
 

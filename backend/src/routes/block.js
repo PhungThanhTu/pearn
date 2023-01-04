@@ -5,6 +5,7 @@ const { getBlockById } = require('../models/block.model');
 const { httpCreateMarkdownBlock, httpGetAllBlocks, httpGetBlock, httpUpdateMarkdownBlock, httpDeleteBlock, httpCreateMarkdownExerciseBlock } = require('../services/block.service');
 
 
+
 // BLOCK API
 router.post('/markdown',authorize("lecturer"),httpCreateMarkdownBlock);
 router.post('/markdownExercise',authorize("lecturer"),httpCreateMarkdownExerciseBlock);

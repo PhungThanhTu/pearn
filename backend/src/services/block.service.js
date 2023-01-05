@@ -39,6 +39,13 @@ module.exports = {
 
         const newBlock = await createBlock(courseId,name,blockType,contentType,newMarkdowncontent);
 
+        if(blockType === "exercise"){
+            const newScoreMeta = await createScoreMeta(newBlock,courseId,0);
+
+            console.info("New Exercise created");
+            console.log(newScoreMeta);
+        }
+
         console.info("New block created");
         console.log(newBlock);
 

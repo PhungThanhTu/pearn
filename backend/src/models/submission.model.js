@@ -161,5 +161,14 @@ module.exports = {
 
 
         return await Submission.aggregate([matchingAggregation,groupingAggregation,addFieldAggregation,divideAggregation,removeFieldsAggregation]);
+    },
+    getSubmissionByBlock: async (username,blockId) => {
+        const query = {
+            studentUsername: username,
+            block: blockId
+        };
+
+        const result = await Submission.findOne(query);
+        return result;
     }
 }

@@ -2,7 +2,7 @@ const { handleOk, handleBadRequest, handleNotFound,validateGuid } = require("../
 const { getBlockById } = require("../models/block.model");
 const { findCourse } = require("../models/courses.model");
 const { setWeightForBlock, getWeightOfBlock, getSumWeight } = require("../models/scoreMetadata.model");
-const { submit, getSubmission, getAllSubmissionByBlock, gradeSubmission, getSumScore, getAllScoreByCourse } = require("../models/submission.model");
+const { submit, getSubmission, getAllSubmissionByBlock, gradeSubmission, getSumScore, getAllScoreByCourse, getSubmissionByBlock } = require("../models/submission.model");
 const { populateUserWithUsername } = require("../models/users.model");
 
 
@@ -125,6 +125,18 @@ module.exports = {
 
         const result = await getWeightOfBlock(blockId);
 
+        return handleOk(res,result);
+    },
+    httpGetMySubmission: async (req,res) => {
+        const blockId = req.params.id;
+        if(!validateGuid(blockId)) return handleNotFound(res,"Invalid GUID");
+
+        const username = req.user.username;
+
+        const block = await getBlockById(blockId);
+        if(!block) return handleNotFound(res,"Block not found");
+
+        const result = await getSubmissionByBlock(username,blockId);
         return handleOk(res,result);
     }
 }

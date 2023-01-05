@@ -1,6 +1,6 @@
 var express = require('express');
 const { authorize } = require('../middlewares/auth.middleware');
-const { httpSetWeight, httpSubmitExercise, httpGetSubmissionById, httpGetAllSubmissionByBlock, httpGradeSubmission, httpGetCourseScoreOfStudent, httpGetAllStudentScoreInCourse, httpGetWeight } = require('../services/score.service');
+const { httpSetWeight, httpSubmitExercise, httpGetSubmissionById, httpGetAllSubmissionByBlock, httpGradeSubmission, httpGetCourseScoreOfStudent, httpGetAllStudentScoreInCourse, httpGetWeight, httpGetMySubmission } = require('../services/score.service');
 var router = express.Router();
 
 
@@ -12,5 +12,6 @@ router.get('/submit/:id',authorize(undefined),httpGetSubmissionById);
 router.get('/submits/:blockId',authorize("lecturer"),httpGetAllSubmissionByBlock);
 router.get('/sum/:courseId/:username',authorize("lecturer"),httpGetCourseScoreOfStudent);
 router.get('/sumAll/:courseId',authorize("lecturer"),httpGetAllStudentScoreInCourse);
+router.get('/mySubmit/:id',authorize("student"),httpGetMySubmission);
 
 module.exports = router;

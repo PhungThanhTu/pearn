@@ -1,7 +1,7 @@
 const { insertCourse, findCourse, deleteCourse, addStudentToCourse, changeLecturer, removeLecturer, checkStudentInCourse, removeStudent, getStudentsInCourse, addStudentsToCourse, getCourses, removeStudentsFromCourse} = require("../models/courses.model");
 const { getUser, populateUserWithUsername } = require("../models/users.model");
 
-const {handleBadRequest,handleCreated,handleNotFound,handleOk, handleNotAllowed} = require('../lib/responseMessage')
+const {handleBadRequest,handleCreated,handleNotFound,handleOk, handleNotAllowed, validateGuid} = require('../lib/responseMessage')
 
 module.exports = {
     httpCreateCourse: async (req,res) => {
@@ -24,7 +24,7 @@ module.exports = {
 
         const courseId = req.params.id;
 
-        if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID");
+        if(!validateGuid(courseId)) return handleNotFound(res,"Invalid GUID")
 
         const course = await findCourse(courseId);
 

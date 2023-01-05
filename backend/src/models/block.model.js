@@ -44,6 +44,19 @@ module.exports = {
         }).populate('content');
         return result;
     },
+    changeBlockName: async (id,newName) => {
+        const query = {
+            _id:id
+        };
+        const updatingData = {
+            name:newName
+        };
+
+        const result = await Block.findOneAndUpdate(query,updatingData,{
+            new:true
+        });
+        return result;
+    },
     createBlock: async (courseId,blockName,blockType,contentType,contentId)  => {
         const newBlock = new Block({
             name: blockName,

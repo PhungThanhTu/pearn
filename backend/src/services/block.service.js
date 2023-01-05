@@ -1,6 +1,6 @@
-const { createBlock, getBlockById, getAllBlockInCourse, deleteBlock } = require("../models/block.model")
+const { createBlock, getBlockById, getAllBlockInCourse, deleteBlock, changeBlockName } = require("../models/block.model")
 const { deleteMarkdownContent, createMarkdownContent, updateMarkdownContent } = require("../models/content.model")
-const {handleOk, handleNotFound, validateGuid} = require('../lib/responseMessage');
+const {handleOk, handleNotFound, validateGuid, handleNotAllowed} = require('../lib/responseMessage');
 const { createScoreMeta } = require("../models/scoreMetadata.model");
 
 const BlockContentDeletionExecutions = {
@@ -21,9 +21,16 @@ module.exports = {
     httpCreateMarkdownBlock: async (req,res) => {
         const name = req.body.name;
         const contentType = "markdownContent";
-        const blockType = "common";
+        const blockType = req.body.type;
         const courseId = req.body.courseId;
         const markdown = req.body.markdown;
+
+        const blockTypeEnum = [
+            "common",
+            "exercise"
+        ];
+        if(!blockTypeEnum.includes(blockType)) return handleNotAllowed(res);
+
 
         const newMarkdowncontent = await createMarkdownContent(markdown);
 
@@ -38,6 +45,19 @@ module.exports = {
         return handleOk(res,newBlock);
         
     },
+    httpChangeBlockName: async (req,res) => {
+        const name = req.body.name;
+        const blockId = req.params.blockId;
+
+        if(!validateGuid(blockId)) return handleNotFound(res,"Invalid GUID");
+
+        const block = await getBlockById(blockId);
+        if(!block) return handleNotFound(res,"Not found");
+
+        const result = await changeBlockName(blockId,name);
+        return handleOk(res,result);
+    }
+    ,
     httpCreateMarkdownExerciseBlock: async (req,res) => {
         const name = req.body.name;
         const contentType = "markdownContent";

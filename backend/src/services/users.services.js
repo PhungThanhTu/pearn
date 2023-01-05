@@ -186,6 +186,7 @@ const getSingleUserProfile = async (username) => {
     const successResult = {
         statuscode:200,
         data:{
+            username:user.username,
             fullname:user.fullname,
             email:user.email,
             role: user.role,

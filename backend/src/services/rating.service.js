@@ -1,4 +1,4 @@
-const { handleNotFound, validateGuid, handleOk } = require("../lib/responseMessage");
+const { handleNotFound, handleOk, validateGuid } = require("../lib/responseMessage");
 const { populateUserWithUsername } = require("../models/users.model");
 const {findCourse} = require('../models/courses.model');
 const { rateCourse, getAverageStar } = require("../models/rating.model");

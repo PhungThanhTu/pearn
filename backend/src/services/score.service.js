@@ -1,4 +1,4 @@
-const { handleOk, handleBadRequest, handleNotFound } = require("../lib/responseMessage");
+const { handleOk, handleBadRequest, handleNotFound,validateGuid } = require("../lib/responseMessage");
 const { getBlockById } = require("../models/block.model");
 const { findCourse } = require("../models/courses.model");
 const { setWeightForBlock, getWeightOfBlock, getSumWeight } = require("../models/scoreMetadata.model");
